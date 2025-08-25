@@ -1,0 +1,57 @@
+
+---Downloaded files---
+The import files for: Business / Portfolio (Elementor) were successfully downloaded!
+Initial max execution time = 30
+Files info:
+Site URL = http://localhost:8080
+Data file = /var/www/html/wp-content/uploads/2025/08/demo-content-import-file_2025-08-25__15-14-15.xml
+Widget file = /var/www/html/wp-content/uploads/2025/08/demo-widgets-import-file_2025-08-25__15-14-15.json
+Customizer file = /var/www/html/wp-content/uploads/2025/08/demo-customizer-import-file_2025-08-25__15-14-15.dat
+
+
+------
+New AJAX call!
+
+
+------
+New AJAX call!
+
+
+------
+New AJAX call!
+
+
+------
+New AJAX call!
+
+
+------
+New AJAX call!
+
+
+---Importing widgets---
+Sidebar : 
+
+Search - Search - Imported
+Block - No Title - Imported
+Block - No Title - Imported
+
+Footer 1 : 
+
+Block - No Title - Imported
+
+Footer 2 : 
+
+Block - No Title - Imported
+
+Footer 3 : 
+
+Block - No Title - Imported
+
+
+
+---Importing customizer settings---
+Customizer settings import finished!
+
+---inspiro_starter_sites/after_import---
+
