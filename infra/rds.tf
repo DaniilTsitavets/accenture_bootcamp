@@ -11,13 +11,13 @@ module "rds" {
 
   manage_master_user_password = true
   //TODO probably create user via smtg else
-  username                    = "team2user"
-  db_name                     = "DBteam2"
+  username = "team2user"
+  db_name  = "DBteam2"
 
-  #   create_cloudwatch_log_group = true
-  #   cloudwatch_log_group_class  = "STANDARD"
-  #   enabled_cloudwatch_logs_exports = ["general"]
-  #   create_monitoring_role      = true
+  create_cloudwatch_log_group = true
+  cloudwatch_log_group_class  = "STANDARD"
+  enabled_cloudwatch_logs_exports = ["general"]
+  create_monitoring_role      = false //should true, but in accenture account there is already created role
 
   create_db_subnet_group = true
   subnet_ids             = module.vpc.private_subnets
