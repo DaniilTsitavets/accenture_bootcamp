@@ -28,7 +28,7 @@ module "alb" {
         healthy_threshold   = 5
         interval            = 30
         matcher             = "200-299"
-        path                = "/"
+        path                = "/wp-admin/install.php"
         port                = "traffic-port"
         protocol            = "HTTP"
         timeout             = 5
