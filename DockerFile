@@ -1,5 +1,3 @@
 # Start from the official WordPress image
 FROM wordpress:latest
 
-# Copy your custom WordPress content (themes, plugins, uploads)
-COPY ./wp-content /var/www/html/wp-content
