@@ -15,26 +15,41 @@ module "ecs-cluster" {
 }
 
 module "ecs-service" {
-  source                    = "terraform-aws-modules/ecs/aws//modules/service"
-  subnet_ids                = module.vpc.private_subnets
-  create_iam_role           = false
-  create_tasks_iam_role     = false
-  create_task_exec_iam_role = true
-  create_task_exec_policy   = true
-  name                      = "team2-wordpress"
+  source      = "terraform-aws-modules/ecs/aws//modules/service"
+  cluster_arn = module.ecs-cluster.arn
+  subnet_ids  = module.vpc.private_subnets
+  name        = "team2-wordpress"
 
   security_group_ids = [module.ecs-sg.security_group_id]
   runtime_platform = {
     cpu_architecture        = "X86_64"
     operating_system_family = "LINUX"
   }
+  create_iam_role           = false
+  create_tasks_iam_role     = false
+  create_task_exec_iam_role = true
+  create_task_exec_policy   = true
+
+  task_exec_iam_role_policies = {
+    secrets = module.ecs-task-secrets-policy.arn
+  }
 
   container_definitions = {
     wordpress = {
-      cpu       = 512
-      memory    = 1024
-      essential = true
-      image     = "${module.ecr.repository_url}:latest"
+      cpu                    = 512
+      memory                 = 1024
+      essential              = true
+      image                  = "${module.ecr.repository_url}:latest"
+      readonlyRootFilesystem = false
+
+      portMappings = [
+        {
+          name          = "wordpress"
+          containerPort = 80
+          hostPort      = 80
+          protocol      = "tcp"
+        }
+      ]
       environment = [
         {
           name  = "WORDPRESS_DB_HOST"
@@ -49,18 +64,18 @@ module "ecs-service" {
       secrets = [
         {
           name      = "WORDPRESS_DB_USER"
-          valueFrom = data.aws_secretsmanager_secret_version.rds_creds_version.arn
+          valueFrom = "${tolist(data.aws_secretsmanager_secrets.rds_creds.arns)[0]}:username::"
         },
         {
           name      = "WORDPRESS_DB_PASSWORD"
-          valueFrom = data.aws_secretsmanager_secret_version.rds_creds_version.arn
+          valueFrom = "${tolist(data.aws_secretsmanager_secrets.rds_creds.arns)[0]}:password::"
         }
       ]
-      create_cloudwatch_log_group = false
+      create_cloudwatch_log_group = true
       logConfiguration = {
         logDriver = "awslogs"
         options = {
-          awslogs-group         = "/aws/ecs/team2/wordpress"
+          awslogs-group         = "/aws/ecs/team2-wordpress/wordpress"
           awslogs-region        = "eu-west-1"
           awslogs-stream-prefix = "ecs"
         }
@@ -74,5 +89,9 @@ module "ecs-service" {
       container_port   = 80
     }
   }
-  tags = var.tags
+
+  enable_autoscaling       = true
+  autoscaling_min_capacity = 1
+  autoscaling_max_capacity = 4
+  alarms = null
 }
