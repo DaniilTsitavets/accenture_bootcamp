@@ -34,6 +34,16 @@ variable "enable_vpn_gateway" {
   default = false
 }
 
+variable "single_nat_gateway" {
+  type    = bool
+  default = true
+}
+
+variable "one_nat_gateway_per_az" {
+  type    = bool
+  default = false
+}
+
 variable "manage_default_security_group" {
   type    = bool
   default = false
