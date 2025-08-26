@@ -3,11 +3,11 @@ provider "aws" {
   profile = "dev-mfa"
 }
 
-# terraform {
-#   backend "s3" {
-#     bucket = ""
-#     use_lockfile = true
-#     key    = "infra/"
-#     region = "eu-west-1"
-#   }
-# }
+terraform {
+  backend "s3" {
+    bucket = "team2-backend-2025-aug"
+    use_lockfile = true
+    key    = "infra"
+    region = "eu-west-1"
+  }
+}
