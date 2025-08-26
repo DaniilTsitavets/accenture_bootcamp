@@ -10,9 +10,14 @@ module "rds-sg" {
       to_port                  = 3306
       protocol                 = "tcp"
       source_security_group_id = module.ec2-bastion-sg.security_group_id
+    },
+    {
+      from_port                = 3306
+      to_port                  = 3306
+      protocol                 = "tcp"
+      source_security_group_id = module.ecs-sg.security_group_id
     }
   ]
-
   egress_with_cidr_blocks = [
     {
       from_port   = 0
