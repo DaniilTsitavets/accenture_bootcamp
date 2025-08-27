@@ -1,0 +1,58 @@
+- name: Build and push image to AWS ECR
+  hosts: localhost
+  connection: local
+  vars:
+    aws_region: "eu-west-1"
+    ecr_repository: "team2-accenture/groupwork"
+    image_tag: "{{ ansible_date_time.iso8601_basic_short }}"
+
+  tasks:
+    - name: Get instance profile info
+      amazon.aws.aws_caller_info:
+      register: aws_info
+
+    - set_fact:
+        ecr_registry_url: "{{ aws_info.account }}.dkr.ecr.eu-west-1.amazonaws.com"
+
+    - name: Get ECR token
+      shell: "aws ecr get-login-password --region eu-west-1"
+      register: ecr_token
+
+    - name: Log into ECR registry
+      docker_login:
+        registry_url: "{{ ecr_registry_url }}"
+        debug: yes
+        username: "AWS"
+        password: "{{ ecr_token.stdout }}"
+        reauthorize: yes
+
+    - name: Get repo URI via AWS CLI
+      command: >
+        aws ecr describe-repositories
+          --repository-names {{ ecr_repository }}
+          --region {{ aws_region }}
+          --query 'repositories[0].repositoryUri'
+          --output text
+      register: ecr_uri_cmd
+
+    - set_fact:
+        ecr_repo_uri: "{{ ecr_uri_cmd.stdout }}"
+
+    - name: Build Docker image
+      community.docker.docker_image:
+        name: "{{  ecr_repo_uri }}"
+        tag: "{{ image_tag }}"
+        source: build
+        build:
+          path: "{{ playbook_dir }}/../Application/"
+
+    - name: Push image to ECR
+      community.docker.docker_image:
+        name: "{{ ecr_repo_uri }}"
+        tag: "{{ image_tag }}"
+        push: true
+        source: local
+
+    - name: Write image tag to GitHub Actions environment
+      ansible.builtin.shell: |
+        echo "IMAGE_TAG={{ image_tag }}" >> $GITHUB_ENV
