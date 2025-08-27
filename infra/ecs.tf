@@ -39,7 +39,7 @@ module "ecs-service" {
       cpu                    = 512
       memory                 = 1024
       essential              = true
-      image                  = "${module.ecr.repository_url}:latest"
+      image                  = "${module.ecr.repository_url}:${var.image_tag}"
       readonlyRootFilesystem = false
 
       portMappings = [
