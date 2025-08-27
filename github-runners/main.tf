@@ -2,7 +2,8 @@ terraform {
 	backend "s3" {
     bucket         = "team2-backend-2025-aug"
     key            = "github-runners.tfstate"
-    region         = var.aws_region
+    region         = "eu-west-1"
+    profile        = "dev-mfa"
   }
 }
 

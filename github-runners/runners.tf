@@ -29,9 +29,18 @@ module "github_runner" {
 
   # ----- GitHub App creds -----
   github_app = {
-    id_ssm             = "/ghrunners/id"
-    key_base64_ssm     = "/ghrunners/key_base64"
-    webhook_secret_ssm = "/ghrunners/webhook_secret"
+    id_ssm = {
+      name = "/ghrunners/app/id"
+      arn  = "arn:aws:ssm:eu-west-1:597765856364:parameter/ghrunners/app/id"
+    }
+    key_base64_ssm = {
+      name = "/ghrunners/app/key_base64"
+      arn = "arn:aws:ssm:eu-west-1:597765856364:parameter/ghrunners/app/key_base64"
+    }
+    webhook_secret_ssm = {
+      name = "/ghrunners/app/webhook_secret"
+      arn = "arn:aws:ssm:eu-west-1:597765856364:parameter/ghrunners/app/webhook_secret"
+    }
   }
 
   create_service_linked_role_spot = true

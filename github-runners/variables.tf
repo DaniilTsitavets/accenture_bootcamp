@@ -56,8 +56,3 @@ variable "instance_types" {
 variable "runner_labels" {
   type    = list(string)
 }
-
-# ----- GitHub App (stored in GitHub Actions secrets) -----
-variable "github_app_id"         { type = string}
-variable "github_app_key_base64" { type = string}
-variable "github_webhook_secret" { type = string}
