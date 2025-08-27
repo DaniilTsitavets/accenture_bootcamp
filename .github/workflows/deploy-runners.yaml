@@ -29,6 +29,7 @@ jobs:
 
       - name: Terraform init/plan/apply
         run: |
+          cd /github-runners
           terraform -version
           terraform init -input=false
           terraform plan -out tfplan -input=false          
