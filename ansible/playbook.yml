@@ -52,3 +52,7 @@
         tag: "{{ image_tag }}"
         push: true
         source: local
+
+    - name: Write image tag to GitHub Actions environment
+      ansible.builtin.shell: |
+        echo "IMAGE_TAG={{ image_tag }}" >> $GITHUB_ENV
