@@ -1,10 +1,7 @@
-
 # RDS Dashboard
 module "rds_dashboard" {
-  source  = "HENNGE/cloudwatch-dashboard/aws"
-
-
-  name = "RDS-team2db-Dashboard"
+  source = "HENNGE/cloudwatch-dashboard/aws"
+  name   = "RDS-team2db-Dashboard"
 
   widgets = [
     module.rds_cpu.widget_object,
@@ -16,48 +13,72 @@ module "rds_dashboard" {
 
 # CPU Utilization widget
 module "rds_cpu" {
-  source  = "HENNGE/cloudwatch-dashboard/aws//modules/widget/metric"
+  source = "HENNGE/cloudwatch-dashboard/aws//modules/widget/metric"
+  title  = "RDS CPU Utilization"
+  region = var.region
+  width  = 12
+  period = 60
 
-
-  namespace  = "AWS/RDS"
-  metric     = "CPUUtilization"
-dimensions = [{ Name = "DBInstanceIdentifier", Value = module.rds.identifier }]
-title      = "RDS CPU Utilization (${module.rds.identifier})"
-stat       = "Average"
+  metrics = [
+    [
+      "AWS/RDS",
+      "CPUUtilization",
+      "DBInstanceIdentifier", module.rds.db_instance_identifier,
+      { stat = "Average" }
+    ]
+  ]
 }
 
 # Free Storage Space widget
 module "rds_free_storage" {
-  source  = "HENNGE/cloudwatch-dashboard/aws//modules/widget/metric"
+  source = "HENNGE/cloudwatch-dashboard/aws//modules/widget/metric"
+  title  = "RDS Free Storage (team2db)"
+  region = var.region
+  width  = 12
+  period = 60
 
-
-  namespace  = "AWS/RDS"
-  metric     = "FreeStorageSpace"
-  dimensions = [{ Name = "DBInstanceIdentifier", Value = module.rds.identifier }]
-  title      = "RDS Free Storage (team2db)"
-  stat       = "Minimum"
+  metrics = [
+    [
+      "AWS/RDS",
+      "FreeStorageSpace",
+      "DBInstanceIdentifier", module.rds.db_instance_identifier,
+      { stat = "Minimum" }
+    ]
+  ]
 }
 
 # Database Connections widget
 module "rds_db_connections" {
-  source  = "HENNGE/cloudwatch-dashboard/aws//modules/widget/metric"
- 
+  source = "HENNGE/cloudwatch-dashboard/aws//modules/widget/metric"
+  title  = "RDS Database Connections (team2db)"
+  region = var.region
+  width  = 12
+  period = 60
 
-  namespace  = "AWS/RDS"
-  metric     = "DatabaseConnections"
-  dimensions = [{ Name = "DBInstanceIdentifier", Value = module.rds.identifier }]
-  title      = "RDS Database Connections (team2db)"
-  stat       = "Average"
+  metrics = [
+    [
+      "AWS/RDS",
+      "DatabaseConnections",
+      "DBInstanceIdentifier", module.rds.db_instance_identifier,
+      { stat = "Average" }
+    ]
+  ]
 }
 
 # Read IOPS widget
 module "rds_read_iops" {
-  source  = "HENNGE/cloudwatch-dashboard/aws//modules/widget/metric"
+  source = "HENNGE/cloudwatch-dashboard/aws//modules/widget/metric"
+  title  = "RDS Read IOPS (team2db)"
+  region = var.region
+  width  = 12
+  period = 60
 
-
-  namespace  = "AWS/RDS"
-  metric     = "ReadIOPS"
-  dimensions = [{ Name = "DBInstanceIdentifier", Value = module.rds.identifier }]
-  title      = "RDS Read IOPS (team2db)"
-  stat       = "Sum"
+  metrics = [
+    [
+      "AWS/RDS",
+      "ReadIOPS",
+      "DBInstanceIdentifier", module.rds.db_instance_identifier,
+      { stat = "Sum" }
+    ]
+  ]
 }
