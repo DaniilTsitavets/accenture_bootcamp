@@ -59,3 +59,8 @@ variable "region" {
   default     = "eu-west-1"
   description = "Region of the infra"
 }
+
+variable "image_tag" {
+  type        = string
+  description = "Tag for ECR image"
+}
