@@ -14,6 +14,9 @@ permissions:
 jobs:
   tf:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: github-runners
     env:
       AWS_REGION: eu-west-1
     steps:
@@ -30,8 +33,8 @@ jobs:
 
       - name: Terraform init/plan/apply
         run: |
-          cd /github-runners
           terraform -version
           terraform init -input=false
-          terraform plan -out tfplan -input=false          
-          # terraform apply -input=false -auto-approve tfplan
+          terraform plan -out tfplan -input=false
+
+# terraform apply -input=false -auto-approve tfplan
