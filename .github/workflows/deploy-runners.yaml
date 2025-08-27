@@ -5,6 +5,7 @@ on:
       - '*'
     paths:
       - 'github-runners/**'
+      - '.github/workflows/deploy-runners.yaml'
 
 permissions:
   id-token: write
