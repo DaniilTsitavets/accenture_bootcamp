@@ -21,8 +21,8 @@ module "rds_cpu" {
 
   namespace  = "AWS/RDS"
   metric     = "CPUUtilization"
-dimensions = [{ Name = "DBInstanceIdentifier", Value = module.rds.identifier }]
-title      = "RDS CPU Utilization (${module.rds.identifier})"
+dimensions = [{ Name = "DBInstanceIdentifier", Value = module.rds.db_instance_identifier }]
+title      = "RDS CPU Utilization (${module.rds.db_instance_identifier})"
 stat       = "Average"
 }
 
@@ -33,7 +33,7 @@ module "rds_free_storage" {
 
   namespace  = "AWS/RDS"
   metric     = "FreeStorageSpace"
-  dimensions = [{ Name = "DBInstanceIdentifier", Value = module.rds.identifier }]
+  dimensions = [{ Name = "DBInstanceIdentifier", Value = module.rds.db_instance_identifier }]
   title      = "RDS Free Storage (team2db)"
   stat       = "Minimum"
 }
@@ -45,7 +45,7 @@ module "rds_db_connections" {
 
   namespace  = "AWS/RDS"
   metric     = "DatabaseConnections"
-  dimensions = [{ Name = "DBInstanceIdentifier", Value = module.rds.identifier }]
+  dimensions = [{ Name = "DBInstanceIdentifier", Value = module.rds.db_instance_identifier }]
   title      = "RDS Database Connections (team2db)"
   stat       = "Average"
 }
@@ -57,7 +57,7 @@ module "rds_read_iops" {
 
   namespace  = "AWS/RDS"
   metric     = "ReadIOPS"
-  dimensions = [{ Name = "DBInstanceIdentifier", Value = module.rds.identifier }]
+  dimensions = [{ Name = "DBInstanceIdentifier", Value = module.rds.db_instance_identifier }]
   title      = "RDS Read IOPS (team2db)"
   stat       = "Sum"
 }
