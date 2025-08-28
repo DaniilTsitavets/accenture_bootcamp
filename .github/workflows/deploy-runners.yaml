@@ -29,6 +29,11 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
           role-session-name: gha-${{ github.run_id }}
 
+      - name: Ensure no AWS profile is set
+        run: |
+          unset AWS_PROFILE
+          echo "AWS_PROFILE is ${AWS_PROFILE:-unset}"
+
       - name: Who am I?
         run: aws sts get-caller-identity
       - name: Setup Terraform
