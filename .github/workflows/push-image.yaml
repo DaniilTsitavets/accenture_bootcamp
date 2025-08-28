@@ -5,11 +5,8 @@ on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
-#    paths:
-#      - 'Application/**'   # only trigger if something inside Application/ changes
+    paths:
+      - 'Application/**'
 
 permissions:
   id-token: write
