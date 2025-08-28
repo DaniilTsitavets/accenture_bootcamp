@@ -14,7 +14,22 @@ data "aws_ami" "al2023" {
   }
 }
 
+data "aws_vpc" "main" {
+  filter {
+    name   = "Name"
+    values = ["team2-bootcamp-vpc"]
+  }
+}
+
 data "aws_subnet" "app_subnets" {
   for_each = toset(var.subnet_ids)
   id       = each.value
+}
+
+data "aws_security_group" "bastion" {
+  filter {
+    name   = "Name"
+    values = ["team2-bastion-sg"]
+  }
+  vpc_id = data.aws_vpc.main.id
 }

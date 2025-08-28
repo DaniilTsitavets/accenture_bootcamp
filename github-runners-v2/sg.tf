@@ -3,6 +3,14 @@ resource "aws_security_group" "runner" {
   description = "No inbound; all egress for GitHub runner"
   vpc_id      = local.vpc_id
 
+  ingress {
+    description = "SSH from bastion hosts only"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    security_groups = [aws_security_group.bastion.id]
+  }
+  
   egress {
     from_port        = 0
     to_port          = 0
