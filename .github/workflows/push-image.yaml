@@ -49,6 +49,10 @@ jobs:
         working-directory: ansible
         run: ansible-playbook playbook.yml
 
+      - name: Install Node.js
+        run: |
+          sudo dnf install -y nodejs
+
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
 
