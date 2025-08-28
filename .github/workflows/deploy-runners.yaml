@@ -45,7 +45,7 @@ jobs:
         run: terraform validate
 
       - name: Terraform plan
-        run: terraform plan -input=false -out tfplan
+        run: terraform plan -var-file=prod.tfvars -input=false -out tfplan
 
       - name: Save plan artifact
         uses: actions/upload-artifact@v4
@@ -88,4 +88,4 @@ jobs:
           path: ${{ env.TF_WORKDIR }}
 
       - name: Terraform apply (approved)
-        run: terraform apply -input=false -auto-approve tfplan
+        run: terraform apply -var-file=prod.tfvars -input=false -auto-approve tfplan
