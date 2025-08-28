@@ -16,7 +16,7 @@ data "aws_ami" "al2023" {
 
 data "aws_vpc" "main" {
   filter {
-    name   = "Name"
+    name   = "tag:Name"
     values = ["team2-bootcamp-vpc"]
   }
 }
@@ -27,6 +27,9 @@ data "aws_subnet" "app_subnets" {
 }
 
 data "aws_security_group" "bastion" {
-  name   = "team2-bastion-sg"
+  filter {
+    name   = "tag:Name"
+    values = ["team2-bootcamp-vpc"]
+  }
   vpc_id = data.aws_vpc.main.id
 }
