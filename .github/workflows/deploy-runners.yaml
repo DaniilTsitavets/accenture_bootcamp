@@ -56,36 +56,36 @@ jobs:
           retention-days: 7
 
   apply:
-      needs: plan
-      runs-on: ubuntu-latest
-      environment: prod
-      concurrency:
-        group: terraform-apply-github-runners
-        cancel-in-progress: false
-      defaults:
-        run:
-          working-directory: ${{ env.TF_WORKDIR }}
-      steps:
-        - uses: actions/checkout@v4
+    needs: plan
+    runs-on: ubuntu-latest
+    environment: prod
+    concurrency:
+      group: terraform-apply-github-runners
+      cancel-in-progress: false
+    defaults:
+      run:
+        working-directory: ${{ env.TF_WORKDIR }}
+    steps:
+      - uses: actions/checkout@v4
 
-        - name: Configure AWS credentials via OIDC
-          uses: aws-actions/configure-aws-credentials@v4
-          with:
-            role-to-assume: arn:aws:iam::597765856364:role/GitHubActionsDeployRole
-            aws-region: ${{ env.AWS_REGION }}
+      - name: Configure AWS credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::597765856364:role/GitHubActionsDeployRole
+          aws-region: ${{ env.AWS_REGION }}
 
-        - name: Setup Terraform
-          uses: hashicorp/setup-terraform@v3
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
 
-        - name: Terraform init (CI backend)
-          run: terraform init -input=false -reconfigure \
-                -backend-config=backend-ci.hcl
+      - name: Terraform init (CI backend)
+        run: terraform init -input=false -reconfigure \
+              -backend-config=backend-ci.hcl
 
-        - name: Download plan artifact
-          uses: actions/download-artifact@v4
-          with:
-            name: tfplan
-            path: ${{ env.TF_WORKDIR }}
+      - name: Download plan artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: tfplan
+          path: ${{ env.TF_WORKDIR }}
 
-        - name: Terraform apply (approved)
-          run: terraform apply -input=false -auto-approve tfplan
+      - name: Terraform apply (approved)
+        run: terraform apply -input=false -auto-approve tfplan
