@@ -22,5 +22,5 @@ module "rds" {
   create_db_subnet_group = true
   subnet_ids             = module.vpc.private_subnets
   vpc_security_group_ids = [module.rds-sg.security_group_id]
-  deletion_protection    = false //TODO should bre true before preview
+  deletion_protection    = true
 }
