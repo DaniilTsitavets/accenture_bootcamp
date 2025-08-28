@@ -1,0 +1,62 @@
+name: Build and Deploy
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'Application/**'
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build-deploy:
+    runs-on: [self-hosted]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::597765856364:role/GitHubActionsDeployRole
+          aws-region: eu-west-1
+
+      - name: Install Docker
+        run: |
+          sudo dnf install -y docker
+          sudo systemctl enable --now docker
+          sudo usermod -aG docker ec2-user
+
+      - name: Install Ansible and collections
+        run: |
+          sudo dnf install -y python3-pip
+          pip3 install ansible boto3 botocore
+          ansible-galaxy collection install amazon.aws community.docker
+
+      - name: Prepare environment
+        run: |
+          sudo dnf install -y unzip
+
+      - name: Run Ansible playbook
+        working-directory: ansible
+        run: ansible-playbook playbook.yml
+
+      - name: Install Node.js
+        run: |
+          sudo dnf install -y nodejs
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        working-directory: infra
+        run: terraform init
+
+      - name: Terraform Apply
+        working-directory: infra
+        run: terraform apply -auto-approve -var-file="prod.tfvars" -var "image_tag=${{ env.IMAGE_TAG }}"

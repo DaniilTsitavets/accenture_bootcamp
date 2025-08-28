@@ -8,7 +8,7 @@ resource "aws_security_group" "runner" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    security_groups = [aws_security_group.bastion.id]
+    security_groups = [data.aws_security_group.bastion.id]
   }
   
   egress {
