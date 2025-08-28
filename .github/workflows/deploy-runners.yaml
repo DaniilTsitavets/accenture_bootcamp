@@ -1,10 +1,11 @@
 name: deploy
+runs-on: [self-hosted, Linux, ec2]
 on:
   push:
     branches:
       - '*'
     paths:
-      - 'github-runners/**'
+      - 'github-runners-v2/**'
       - '.github/workflows/deploy-runners.yaml'
 
 permissions:
@@ -12,8 +13,8 @@ permissions:
   contents: read
 
 jobs:
-  tf:
-    runs-on: ubuntu-latest
+  terraform init:
+    runs-on: [self-hosted, Linux, ec2]
     defaults:
       run:
         working-directory: github-runners
@@ -27,7 +28,10 @@ jobs:
         with:
           role-to-assume: arn:aws:iam::597765856364:role/GitHubActionsDeployRole
           aws-region: ${{ env.AWS_REGION }}
+          role-session-name: gha-${{ github.run_id }}
 
+      - name: Who am I?
+        run: aws sts get-caller-identity
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
 
