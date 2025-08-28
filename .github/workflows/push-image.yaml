@@ -33,7 +33,7 @@ jobs:
         run: |
           sudo dnf install -y docker
           sudo systemctl enable --now docker
-          sudo usermod -aG docker $USER
+          sudo usermod -aG docker ec2-user
 
       - name: Install Ansible and collections
         run: |
