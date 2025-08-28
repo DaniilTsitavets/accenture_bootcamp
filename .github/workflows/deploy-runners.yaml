@@ -1,5 +1,4 @@
 name: deploy
-runs-on: [self-hosted, Linux, ec2]
 on:
   push:
     branches:
@@ -14,7 +13,7 @@ permissions:
 
 jobs:
   terraform init:
-    runs-on: [self-hosted, Linux, ec2]
+    runs-on: "ubuntu-latest"
     defaults:
       run:
         working-directory: github-runners
