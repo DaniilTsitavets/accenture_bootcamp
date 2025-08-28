@@ -17,7 +17,7 @@ permissions:
 
 jobs:
   build-deploy:
-    runs-on: [self-hosted, Linux, X64, ec2]
+    runs-on: [self-hosted]
 
     steps:
       - name: Checkout code
