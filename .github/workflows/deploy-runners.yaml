@@ -1,5 +1,6 @@
 name: runners-terraform
 on:
+  workflow_dispatch:
   push:
     branches:
       - '*'
@@ -13,14 +14,15 @@ permissions:
 
 env:
   AWS_REGION: eu-west-1
-  TF_WORKDIR: github-runners-v2
+  RUNNER_WORKDIR: github-runners-v2
+  INFRA_WORKDIR: infra
 
 jobs:
   plan:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ${{ env.TF_WORKDIR }}
+        working-directory: ${{ env.RUNNER_WORKDIR }}
     steps:
       - uses: actions/checkout@v4
 
@@ -37,9 +39,7 @@ jobs:
         uses: hashicorp/setup-terraform@v3
 
       - name: Terraform init (CI backend)
-        run: |
-          terraform -version
-          terraform init -input=false
+        run: terraform init -input=false
 
       - name: Terraform validate
         run: terraform validate
@@ -51,12 +51,39 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: tfplan
-          path: ${{ env.TF_WORKDIR }}/tfplan
+          path: ${{ env.RUNNER_WORKDIR }}/tfplan
           if-no-files-found: error
           retention-days: 7
 
-  apply:
+  apply-bootstrap:
     needs: plan
+    runs-on: ubuntu-latest
+    environment: prod
+    concurrency:
+      group: terraform-bootstrap
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::597765856364:role/GitHubActionsDeployRole
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform init prerequirements
+        working-directory: ${{ env.INFRA_WORKDIR }}
+        run: terraform init -input=false
+
+      - name: Terraform apply prerequirements
+        working-directory: ${{ env.INFRA_WORKDIR }}
+        run: terraform apply -auto-approve -target=module.vpc -target=module.ecr -var-file="prod.tfvars"
+
+  apply-runners:
+    needs: apply-bootstrap
     runs-on: ubuntu-latest
     environment: prod
     concurrency:
@@ -64,7 +91,7 @@ jobs:
       cancel-in-progress: false
     defaults:
       run:
-        working-directory: ${{ env.TF_WORKDIR }}
+        working-directory: ${{ env.RUNNER_WORKDIR }}
     steps:
       - uses: actions/checkout@v4
 
@@ -84,7 +111,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: tfplan
-          path: ${{ env.TF_WORKDIR }}
+          path: ${{ env.RUNNER_WORKDIR }}
 
       - name: Terraform apply (approved)
         run: terraform apply -var-file=prod.tfvars -input=false -auto-approve tfplan
