@@ -1,0 +1,49 @@
+name: Build and Deploy
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'Application/**'   # only trigger if something inside Application/ changes
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::597765856364:role/GitHubActionsDeployRole
+          aws-region: eu-west-1
+
+      - name: Install Ansible and collections
+        run: |
+          sudo apt-get update && sudo apt-get install -y python3-pip
+          pip3 install --upgrade pip
+          pip3 install ansible boto3 botocore
+          ansible-galaxy collection install amazon.aws community.docker
+
+      - name: Run Ansible playbook
+        working-directory: ansible
+        run: ansible-playbook playbook.yml
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        working-directory: infra
+        run: terraform init
+
+      - name: Terraform Apply
+        working-directory: infra
+        run: terraform apply -auto-approve -var-file="prod.tfvars" -var "image_tag=${{ env.IMAGE_TAG }}"
