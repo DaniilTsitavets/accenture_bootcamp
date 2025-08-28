@@ -27,9 +27,6 @@ data "aws_subnet" "app_subnets" {
 }
 
 data "aws_security_group" "bastion" {
-  filter {
-    name   = "Name"
-    values = ["team2-bastion-sg"]
-  }
+  name   = "team2-bastion-sg"
   vpc_id = data.aws_vpc.main.id
 }
