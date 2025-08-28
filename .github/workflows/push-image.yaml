@@ -29,6 +29,12 @@ jobs:
           role-to-assume: arn:aws:iam::597765856364:role/GitHubActionsDeployRole
           aws-region: eu-west-1
 
+      - name: Install Docker
+        run: |
+          sudo dnf install -y docker
+          sudo systemctl enable --now docker
+          sudo usermod -aG docker $USER
+
       - name: Install Ansible and collections
         run: |
           sudo dnf install -y python3-pip
