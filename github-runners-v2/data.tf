@@ -29,7 +29,7 @@ data "aws_subnet" "app_subnets" {
 data "aws_security_group" "bastion" {
   filter {
     name   = "tag:Name"
-    values = ["team2-bootcamp-vpc"]
+    values = ["team2-bootcamp-sg"]
   }
   vpc_id = data.aws_vpc.main.id
 }
