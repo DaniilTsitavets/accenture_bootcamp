@@ -78,8 +78,7 @@ jobs:
         uses: hashicorp/setup-terraform@v3
 
       - name: Terraform init (CI backend)
-        run: terraform init -input=false -reconfigure \
-              -backend-config=backend-ci.hcl
+        run: terraform init -input=false 
 
       - name: Download plan artifact
         uses: actions/download-artifact@v4
