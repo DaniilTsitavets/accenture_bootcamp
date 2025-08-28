@@ -62,5 +62,6 @@ variable "region" {
 
 variable "image_tag" {
   type        = string
+  default     = null
   description = "Tag for ECR image"
 }
