@@ -41,6 +41,10 @@ jobs:
           pip3 install ansible boto3 botocore
           ansible-galaxy collection install amazon.aws community.docker
 
+      - name: Prepare environment
+        run: |
+          sudo dnf install -y unzip
+
       - name: Run Ansible playbook
         working-directory: ansible
         run: ansible-playbook playbook.yml
