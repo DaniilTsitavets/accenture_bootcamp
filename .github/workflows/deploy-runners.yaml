@@ -1,4 +1,4 @@
-name: deploy
+name: runners-terraform
 on:
   push:
     branches:
@@ -11,14 +11,16 @@ permissions:
   id-token: write
   contents: read
 
+env:
+  AWS_REGION: eu-west-1
+  TF_WORKDIR: github-runners
+
 jobs:
-  terraform-init:
-    runs-on: "ubuntu-latest"
+  plan:
+    runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: github-runners-v2
-    env:
-      AWS_REGION: eu-west-1
+        working-directory: ${{ env.TF_WORKDIR }}
     steps:
       - uses: actions/checkout@v4
 
@@ -27,22 +29,63 @@ jobs:
         with:
           role-to-assume: arn:aws:iam::597765856364:role/GitHubActionsDeployRole
           aws-region: ${{ env.AWS_REGION }}
-          role-session-name: gha-${{ github.run_id }}
 
-      - name: Ensure no AWS profile is set
-        run: |
-          unset AWS_PROFILE
-          echo "AWS_PROFILE is ${AWS_PROFILE:-unset}"
-
-      - name: Who am I?
+      - name: Show caller identity (debug)
         run: aws sts get-caller-identity
+
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
 
-      - name: Terraform init/plan/apply
+      - name: Terraform init (CI backend)
         run: |
           terraform -version
           terraform init -input=false
-          terraform plan -out tfplan -input=false
 
-# terraform apply -input=false -auto-approve tfplan
+      - name: Terraform validate
+        run: terraform validate
+
+      - name: Terraform plan
+        run: terraform plan -input=false -out tfplan
+
+      - name: Save plan artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: tfplan
+          path: ${{ env.TF_WORKDIR }}/tfplan
+          if-no-files-found: error
+          retention-days: 7
+
+  apply:
+      needs: plan
+      runs-on: ubuntu-latest
+      environment: prod
+      concurrency:
+        group: terraform-apply-github-runners
+        cancel-in-progress: false
+      defaults:
+        run:
+          working-directory: ${{ env.TF_WORKDIR }}
+      steps:
+        - uses: actions/checkout@v4
+
+        - name: Configure AWS credentials via OIDC
+          uses: aws-actions/configure-aws-credentials@v4
+          with:
+            role-to-assume: arn:aws:iam::597765856364:role/GitHubActionsDeployRole
+            aws-region: ${{ env.AWS_REGION }}
+
+        - name: Setup Terraform
+          uses: hashicorp/setup-terraform@v3
+
+        - name: Terraform init (CI backend)
+          run: terraform init -input=false -reconfigure \
+                -backend-config=backend-ci.hcl
+
+        - name: Download plan artifact
+          uses: actions/download-artifact@v4
+          with:
+            name: tfplan
+            path: ${{ env.TF_WORKDIR }}
+
+        - name: Terraform apply (approved)
+          run: terraform apply -input=false -auto-approve tfplan
