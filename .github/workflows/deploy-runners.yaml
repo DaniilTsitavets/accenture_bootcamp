@@ -80,7 +80,7 @@ jobs:
 
       - name: Terraform apply prerequirements
         working-directory: ${{ env.INFRA_WORKDIR }}
-        run: terraform apply -auto-approve -target=module.vpc -target=module.ecr -var-file="prod.tfvars" -input='false'
+        run: terraform apply -auto-approve -target=module.vpc -target=module.ecr -var-file="prod.tfvars" -input=false
 
   apply-runners:
     needs: apply-bootstrap
